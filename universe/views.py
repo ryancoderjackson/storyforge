@@ -1,32 +1,65 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Universe, Event
+from django.db.models import Prefetch
+from .models import Universe, Event, Faction
 
 # Create your views here.
 @login_required
 def timeline_home(request):
-    # Temporary approach: pick the first universe for this user
     universe = Universe.objects.filter(owner=request.user).first()
 
-    # If no universe exists yet, show an empty state
     events = Event.objects.none()
+    total_events = 0
+    major_count = 0
+
+    # For filter dropdown
+    factions = Faction.objects.none()
+
+    # Read query params
+    selected_type = request.GET.get("type", "")
+    selected_major = request.GET.get("major", "")
+    selected_faction = request.GET.get("faction", "")
+
     if universe:
+        factions = Faction.objects.filter(universe=universe).order_by("name")
+
         events = (
             Event.objects.filter(universe=universe)
             .select_related("location")
             .prefetch_related("factions")
-            .order_by("era", "year", "day", "created_at")
         )
 
-    total_events = events.count()
-    major_count = events.filter(is_major=True).count()
+        # Apply filters
+        if selected_type:
+            events = events.filter(event_type=selected_type)
+
+        if selected_major == "1":
+            events = events.filter(is_major=True)
+
+        if selected_faction:
+            events = events.filter(factions__id=selected_faction)
+
+        events = events.order_by("era", "year", "day", "created_at")
+
+        total_events = events.count()
+        major_count = events.filter(is_major=True).count()
 
     context = {
         "universe": universe,
         "events": events,
         "total_events": total_events,
         "major_count": major_count,
+        "factions": factions,
+
+        # keep selected values so dropdowns “stick”
+        "selected_type": selected_type,
+        "selected_major": selected_major,
+        "selected_faction": selected_faction,
+
+        # event type choices for dropdown
+        "event_type_choices": Event.EventType.choices,
     }
+
     return render(request, "universe/timeline_home.html", context)
 
 @login_required

@@ -59,6 +59,50 @@
     </div>
   </div>
 
+  <div class="sf-panel p-3 p-md-4 mb-3">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-md-4">
+        <label class="sf-muted small mb-1">Event Type</label>
+        <select class="form-select form-select-sm" name="type">
+          <option value="">All</option>
+          {% for value,label in event_type_choices %}
+            <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <label class="sf-muted small mb-1">Faction</label>
+        <select class="form-select form-select-sm" name="faction">
+          <option value="">All</option>
+          {% for faction in factions %}
+            <option value="{{ faction.id }}" {% if selected_faction == faction.id|stringformat:"s" %}selected{% endif %}>
+              {{ faction.short_name|default:faction.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-12 col-md-2">
+        <label class="sf-muted small mb-1">Major</label>
+        <select class="form-select form-select-sm" name="major">
+          <option value="">All</option>
+          <option value="1" {% if selected_major == "1" %}selected{% endif %}>Major Only</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-2 d-grid">
+        <button class="btn btn-sm btn-outline-light" type="submit">Filter</button>
+      </div>
+
+      <div class="col-12">
+        <a class="sf-muted small" href="{% url 'universe:timeline_home' %}">Clear filters</a>
+      </div>
+    </form>
+  </div>
+
   <div class="sf-panel p-3 p-md-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h5 class="mb-0">Chronological Events</h5>
