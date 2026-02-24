@@ -1,0 +1,64 @@
+{% extends "universe/base.html" %}
+
+{% block title %}{{ event.title }} | StoryForge{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+  <div>
+    <div class="sf-muted small">UNIVERSE</div>
+    <h2 class="mb-1">{{ event.universe.name }}</h2>
+    <div class="sf-muted">
+      <a href="{% url 'universe:timeline_home' %}">← Back to Timeline</a>
+    </div>
+  </div>
+
+  <div class="text-end">
+    <div class="sf-muted small">DATE</div>
+    <div class="sf-chip">
+      {{ event.get_era_display }} • Year {{ event.year }} • Day {{ event.day }}
+    </div>
+    <div class="mt-2">
+      <span class="sf-chip">{{ event.get_event_type_display }}</span>
+      {% if event.is_major %}
+        <span class="sf-chip">MAJOR</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="sf-panel p-3 p-md-4">
+  <h3 class="mb-2">{{ event.title }}</h3>
+
+  {% if event.location %}
+    <div class="sf-muted mb-3">
+      Location: <strong>{{ event.location.name }}</strong>
+    </div>
+  {% endif %}
+
+  {% if event.summary %}
+    <p class="sf-muted mb-3">{{ event.summary }}</p>
+  {% endif %}
+
+  <div class="sf-divider my-3"></div>
+
+  <h6 class="sf-muted mb-2">Involved Factions</h6>
+  {% if event.factions.all %}
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      {% for faction in event.factions.all %}
+        <span class="sf-chip">{{ faction.short_name|default:faction.name }}</span>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="sf-muted">No factions linked.</p>
+  {% endif %}
+
+  <div class="sf-divider my-3"></div>
+
+  <h6 class="sf-muted mb-2">Archive Notes</h6>
+  <p class="sf-muted mb-0">
+    This event record is part of the StoryForge timeline archive. Future versions may include linked lore entries, characters, and supporting artifacts.
+  </p>
+</div>
+
+{% endblock %}

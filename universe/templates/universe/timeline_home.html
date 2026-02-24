@@ -76,7 +76,11 @@
                 <div class="sf-muted small">
                   {{ event.get_era_display }} • Year {{ event.year }} • Day {{ event.day }}
                 </div>
-                <div class="fs-5">{{ event.title }}</div>
+                <div class="fs-5">
+                  <a class="text-decoration-none" href="{% url 'universe:event_detail' event.pk %}">
+                    {{ event.title }}
+                  </a>
+                </div>
               </div>
 
               <div class="text-end">

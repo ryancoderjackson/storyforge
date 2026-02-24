@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from .models import Universe, Event
 
 # Create your views here.
+@login_required
 def timeline_home(request):
     # Temporary approach: pick the first universe for this user
     universe = Universe.objects.filter(owner=request.user).first()
@@ -26,3 +28,14 @@ def timeline_home(request):
         "major_count": major_count,
     }
     return render(request, "universe/timeline_home.html", context)
+
+@login_required
+def event_detail(request, pk):
+    event = get_object_or_404(
+        Event.objects.select_related("universe", "location").prefetch_related("factions"),
+        pk=pk,
+        universe__owner=request.user,
+    )
+
+    context = {"event": event}
+    return render(request, "universe/event_detail.html", context)
