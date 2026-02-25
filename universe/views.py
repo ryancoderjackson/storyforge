@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch, Count
-from .models import Universe, Event, Faction
+from .models import Universe, Event, Faction, Location
 
 # Create your views here.
 @login_required
@@ -112,3 +112,45 @@ def faction_detail(request, pk):
         "event_count": events.count(),
     }
     return render(request, "universe/faction_detail.html", context)
+
+@login_required
+def locations_index(request):
+    universe = Universe.objects.filter(owner=request.user).first()
+
+    locations = Location.objects.none()
+    if universe:
+        locations = (
+            Location.objects.filter(universe=universe)
+            .select_related("controlling_faction")
+            .annotate(event_count=Count("events", distinct=True))
+            .order_by("name")  # alphabetical
+        )
+
+    context = {
+        "universe": universe,
+        "locations": locations,
+    }
+    return render(request, "universe/locations_index.html", context)
+
+
+@login_required
+def location_detail(request, pk):
+    location = get_object_or_404(
+        Location.objects.select_related("universe", "controlling_faction"),
+        pk=pk,
+        universe__owner=request.user,
+    )
+
+    events = (
+        Event.objects.filter(universe=location.universe, location=location)
+        .select_related("location")
+        .prefetch_related("factions")
+        .order_by("era", "year", "day", "created_at")
+    )
+
+    context = {
+        "location": location,
+        "events": events,
+        "event_count": events.count(),
+    }
+    return render(request, "universe/location_detail.html", context)

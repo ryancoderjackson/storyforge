@@ -1,0 +1,83 @@
+{% extends "universe/base.html" %}
+
+{% block title %}Locations | StoryForge{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+  <div>
+    <div class="sf-muted small">UNIVERSE</div>
+    <h2 class="mb-0">
+      {% if universe %}{{ universe.name }}{% else %}No Universe Found{% endif %}
+    </h2>
+    <div class="sf-muted">
+      <a href="{% url 'universe:timeline_home' %}">← Back to Timeline</a>
+    </div>
+  </div>
+
+  <div class="text-end">
+    <div class="sf-muted small">INDEX</div>
+    <div class="sf-chip">LOCATIONS</div>
+  </div>
+</div>
+
+{% if not universe %}
+  <div class="sf-panel p-4">
+    <h5 class="mb-2">Empty Archive</h5>
+    <p class="sf-muted mb-0">
+      Create a Universe in the admin panel, then add locations to populate this index.
+    </p>
+  </div>
+{% else %}
+
+  <div class="sf-panel p-3 p-md-4">
+    {% if locations %}
+      <div class="row g-3">
+        {% for location in locations %}
+          <div class="col-12 col-md-6">
+            <div class="sf-panel p-3 h-100">
+              <div class="d-flex justify-content-between align-items-start gap-3">
+                <div>
+                  <div class="sf-muted small">LOCATION</div>
+                  <div class="fs-5 mb-1">
+                    <a class="text-decoration-none" href="{% url 'universe:location_detail' location.pk %}">
+                      {{ location.name }}
+                    </a>
+                  </div>
+                </div>
+
+                <div class="text-end">
+                  <span class="sf-chip">{{ location.get_location_type_display }}</span>
+                  <span class="sf-chip">{{ location.event_count }} events</span>
+                </div>
+              </div>
+
+              <div class="mt-2">
+                {% if location.controlling_faction %}
+                  <div class="sf-muted small">Controlling Faction</div>
+                  <div class="sf-muted">
+                    <a class="text-decoration-none" href="{% url 'universe:faction_detail' location.controlling_faction.pk %}">
+                      {{ location.controlling_faction.short_name|default:location.controlling_faction.name }}
+                    </a>
+                  </div>
+                {% else %}
+                  <div class="sf-muted small">Controlling Faction</div>
+                  <div class="sf-muted">Unassigned</div>
+                {% endif %}
+              </div>
+
+              {% if location.description %}
+                <p class="sf-muted mt-2 mb-0">{{ location.description|truncatechars:160 }}</p>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="sf-muted mb-0">No locations yet. Add locations in the admin panel.</p>
+    {% endif %}
+  </div>
+
+{% endif %}
+
+{% endblock %}
