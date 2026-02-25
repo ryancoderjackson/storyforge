@@ -40,11 +40,13 @@
                 <div>
                   <div class="sf-muted small">FACTION</div>
                   <div class="fs-5 mb-1">
-                    {{ faction.name }}
+                    <a class="text-decoration-none" href="{% url 'universe:faction_detail' faction.pk %}">
+                        {{ faction.name }}
+                    </a>
                     {% if faction.short_name %}
-                      <span class="sf-muted">({{ faction.short_name }})</span>
+                        <span class="sf-muted">({{ faction.short_name }})</span>
                     {% endif %}
-                  </div>
+                    </div>
                 </div>
 
                 <div class="text-end">

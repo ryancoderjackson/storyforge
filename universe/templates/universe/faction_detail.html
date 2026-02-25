@@ -1,0 +1,102 @@
+{% extends "universe/base.html" %}
+
+{% block title %}{{ faction.name }} | StoryForge{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+  <div>
+    <div class="sf-muted small">UNIVERSE</div>
+    <h2 class="mb-0">{{ faction.universe.name }}</h2>
+    <div class="sf-muted">
+      <a href="{% url 'universe:factions_index' %}">← Back to Factions</a>
+      <span class="sf-muted"> • </span>
+      <a href="{% url 'universe:timeline_home' %}">Timeline</a>
+    </div>
+  </div>
+
+  <div class="text-end">
+    <div class="sf-muted small">FACTION</div>
+    <div class="sf-chip">{{ faction.get_alignment_display }}</div>
+  </div>
+</div>
+
+<div class="sf-panel p-3 p-md-4 mb-3">
+  <div class="d-flex justify-content-between flex-wrap gap-2 align-items-start">
+    <div>
+      <div class="sf-muted small">ENTITY</div>
+      <h3 class="mb-1">
+        {{ faction.name }}
+        {% if faction.short_name %}
+          <span class="sf-muted">({{ faction.short_name }})</span>
+        {% endif %}
+      </h3>
+      <div class="sf-muted">{{ event_count }} linked event{{ event_count|pluralize }}</div>
+    </div>
+    <div>
+      <span class="sf-chip">STATUS</span>
+      <span class="sf-chip">ACTIVE</span>
+    </div>
+  </div>
+
+  <div class="sf-divider my-3"></div>
+
+  <h6 class="sf-muted mb-2">Description</h6>
+  {% if faction.description %}
+    <p class="sf-muted mb-0">{{ faction.description }}</p>
+  {% else %}
+    <p class="sf-muted mb-0">No description yet.</p>
+  {% endif %}
+</div>
+
+<div class="sf-panel p-3 p-md-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Faction Timeline</h5>
+    <span class="sf-muted small">Chronological</span>
+  </div>
+
+  <div class="sf-divider mb-3"></div>
+
+  {% if events %}
+    <div class="vstack gap-3">
+      {% for event in events %}
+        <div class="{% if event.is_major %}sf-major{% endif %}">
+          <div class="d-flex justify-content-between flex-wrap gap-2">
+            <div>
+              <div class="sf-muted small">
+                {{ event.get_era_display }} • Year {{ event.year }} • Day {{ event.day }}
+              </div>
+              <div class="fs-5">
+                <a class="text-decoration-none" href="{% url 'universe:event_detail' event.pk %}">
+                  {{ event.title }}
+                </a>
+              </div>
+              {% if event.location %}
+                <div class="sf-muted mt-1">Location: <strong>{{ event.location.name }}</strong></div>
+              {% endif %}
+            </div>
+
+            <div class="text-end">
+              <span class="sf-chip">{{ event.get_event_type_display }}</span>
+              {% if event.is_major %}
+                <span class="sf-chip">MAJOR</span>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if event.summary %}
+            <p class="mt-2 mb-0 sf-muted">{{ event.summary }}</p>
+          {% endif %}
+        </div>
+
+        {% if not forloop.last %}
+          <div class="sf-divider"></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="sf-muted mb-0">No events linked to this faction yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

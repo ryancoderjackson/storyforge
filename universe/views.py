@@ -90,3 +90,25 @@ def factions_index(request):
         "factions": factions,
     }
     return render(request, "universe/factions_index.html", context)
+
+@login_required
+def faction_detail(request, pk):
+    faction = get_object_or_404(
+        Faction.objects.select_related("universe"),
+        pk=pk,
+        universe__owner=request.user,
+    )
+
+    events = (
+        Event.objects.filter(universe=faction.universe, factions=faction)
+        .select_related("location")
+        .prefetch_related("factions")
+        .order_by("era", "year", "day", "created_at")
+    )
+
+    context = {
+        "faction": faction,
+        "events": events,
+        "event_count": events.count(),
+    }
+    return render(request, "universe/faction_detail.html", context)
