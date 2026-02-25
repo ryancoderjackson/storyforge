@@ -1,0 +1,140 @@
+{% extends "universe/base.html" %}
+
+{% block title %}Search | StoryForge{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+  <div>
+    <div class="sf-muted small">SEARCH</div>
+    <h2 class="mb-0">
+      {% if q %}Results for “{{ q }}”{% else %}Search the Archive{% endif %}
+    </h2>
+    <div class="sf-muted">
+      {% if universe %}Universe: {{ universe.name }}{% endif %}
+    </div>
+  </div>
+
+  <div class="text-end">
+    <div class="sf-muted small">TOTAL</div>
+    <div class="sf-chip">{{ total_results }} result{{ total_results|pluralize }}</div>
+  </div>
+</div>
+
+{% if not q %}
+  <div class="sf-panel p-4">
+    <p class="sf-muted mb-0">Type a keyword in the search bar above to search events, factions, and locations.</p>
+  </div>
+{% else %}
+
+  <!-- Factions -->
+  <div class="sf-panel p-3 p-md-4 mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">Factions</h5>
+      <span class="sf-muted small">{{ factions|length }} found</span>
+    </div>
+    <div class="sf-divider mb-3"></div>
+
+    {% if factions %}
+      <div class="vstack gap-2">
+        {% for faction in factions %}
+          <div>
+            <div class="fs-5">
+              <a class="text-decoration-none" href="{% url 'universe:faction_detail' faction.pk %}">
+                {{ faction.name }}
+              </a>
+              {% if faction.short_name %}<span class="sf-muted">({{ faction.short_name }})</span>{% endif %}
+            </div>
+            {% if faction.description %}
+              <div class="sf-muted">{{ faction.description|truncatechars:180 }}</div>
+            {% endif %}
+          </div>
+          {% if not forloop.last %}<div class="sf-divider"></div>{% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="sf-muted mb-0">No matching factions.</p>
+    {% endif %}
+  </div>
+
+  <!-- Locations -->
+  <div class="sf-panel p-3 p-md-4 mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">Locations</h5>
+      <span class="sf-muted small">{{ locations|length }} found</span>
+    </div>
+    <div class="sf-divider mb-3"></div>
+
+    {% if locations %}
+      <div class="vstack gap-2">
+        {% for location in locations %}
+          <div>
+            <div class="fs-5">
+              <a class="text-decoration-none" href="{% url 'universe:location_detail' location.pk %}">
+                {{ location.name }}
+              </a>
+              <span class="sf-muted">• {{ location.get_location_type_display }}</span>
+            </div>
+            {% if location.description %}
+              <div class="sf-muted">{{ location.description|truncatechars:180 }}</div>
+            {% endif %}
+          </div>
+          {% if not forloop.last %}<div class="sf-divider"></div>{% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="sf-muted mb-0">No matching locations.</p>
+    {% endif %}
+  </div>
+
+  <!-- Events -->
+  <div class="sf-panel p-3 p-md-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">Events</h5>
+      <span class="sf-muted small">{{ events|length }} found</span>
+    </div>
+    <div class="sf-divider mb-3"></div>
+
+    {% if events %}
+      <div class="vstack gap-3">
+        {% for event in events %}
+          <div class="{% if event.is_major %}sf-major{% endif %}">
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+              <div>
+                <div class="sf-muted small">
+                  {{ event.get_era_display }} • Year {{ event.year }} • Day {{ event.day }}
+                </div>
+                <div class="fs-5">
+                  <a class="text-decoration-none" href="{% url 'universe:event_detail' event.pk %}">
+                    {{ event.title }}
+                  </a>
+                </div>
+                {% if event.location %}
+                  <div class="sf-muted mt-1">Location: <strong>{{ event.location.name }}</strong></div>
+                {% endif %}
+              </div>
+
+              <div class="text-end">
+                <span class="sf-chip">{{ event.get_event_type_display }}</span>
+                {% if event.is_major %}<span class="sf-chip">MAJOR</span>{% endif %}
+              </div>
+            </div>
+
+            {% if event.summary %}
+              <p class="mt-2 mb-0 sf-muted">{{ event.summary|truncatechars:220 }}</p>
+            {% endif %}
+          </div>
+
+          {% if not forloop.last %}
+            <div class="sf-divider"></div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="sf-muted mb-0">No matching events.</p>
+    {% endif %}
+  </div>
+
+{% endif %}
+
+{% endblock %}

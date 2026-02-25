@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Prefetch, Count
+from django.db.models import Prefetch, Count, Q
 from .models import Universe, Event, Faction, Location
 
 # Create your views here.
@@ -154,3 +154,55 @@ def location_detail(request, pk):
         "event_count": events.count(),
     }
     return render(request, "universe/location_detail.html", context)
+
+@login_required
+def search(request):
+    universe = Universe.objects.filter(owner=request.user).first()
+
+    q = (request.GET.get("q") or "").strip()
+
+    events = Event.objects.none()
+    factions = Faction.objects.none()
+    locations = Location.objects.none()
+
+    if universe and q:
+        events = (
+            Event.objects.filter(universe=universe)
+            .filter(
+                Q(title__icontains=q) |
+                Q(summary__icontains=q)
+            )
+            .select_related("location")
+            .prefetch_related("factions")
+            .order_by("era", "year", "day", "created_at")
+        )
+
+        factions = (
+            Faction.objects.filter(universe=universe)
+            .filter(
+                Q(name__icontains=q) |
+                Q(short_name__icontains=q) |
+                Q(description__icontains=q)
+            )
+            .order_by("name")
+        )
+
+        locations = (
+            Location.objects.filter(universe=universe)
+            .filter(
+                Q(name__icontains=q) |
+                Q(description__icontains=q)
+            )
+            .select_related("controlling_faction")
+            .order_by("name")
+        )
+
+    context = {
+        "universe": universe,
+        "q": q,
+        "events": events,
+        "factions": factions,
+        "locations": locations,
+        "total_results": (events.count() + factions.count() + locations.count()) if (universe and q) else 0,
+    }
+    return render(request, "universe/search_results.html", context)
