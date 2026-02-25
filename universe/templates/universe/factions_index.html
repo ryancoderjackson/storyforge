@@ -1,0 +1,76 @@
+{% extends "universe/base.html" %}
+
+{% block title %}Factions | StoryForge{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+  <div>
+    <div class="sf-muted small">UNIVERSE</div>
+    <h2 class="mb-0">
+      {% if universe %}{{ universe.name }}{% else %}No Universe Found{% endif %}
+    </h2>
+    <div class="sf-muted">
+      <a href="{% url 'universe:timeline_home' %}">← Back to Timeline</a>
+    </div>
+  </div>
+
+  <div class="text-end">
+    <div class="sf-muted small">INDEX</div>
+    <div class="sf-chip">FACTIONS</div>
+  </div>
+</div>
+
+{% if not universe %}
+  <div class="sf-panel p-4">
+    <h5 class="mb-2">Empty Archive</h5>
+    <p class="sf-muted mb-0">
+      Create a Universe in the admin panel, then add factions to populate this index.
+    </p>
+  </div>
+{% else %}
+
+  <div class="sf-panel p-3 p-md-4">
+    {% if factions %}
+      <div class="row g-3">
+        {% for faction in factions %}
+          <div class="col-12 col-md-6">
+            <div class="sf-panel p-3 h-100">
+              <div class="d-flex justify-content-between align-items-start gap-3">
+                <div>
+                  <div class="sf-muted small">FACTION</div>
+                  <div class="fs-5 mb-1">
+                    {{ faction.name }}
+                    {% if faction.short_name %}
+                      <span class="sf-muted">({{ faction.short_name }})</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="text-end">
+                  <span class="sf-chip">{{ faction.get_alignment_display }}</span>
+                  <span class="sf-chip">{{ faction.event_count }} events</span>
+                </div>
+              </div>
+
+              {% if faction.description %}
+                <p class="sf-muted mt-2 mb-0">
+                  {{ faction.description|truncatechars:180 }}
+                </p>
+              {% else %}
+                <p class="sf-muted mt-2 mb-0">
+                  No description yet.
+                </p>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="sf-muted mb-0">No factions yet. Add factions in the admin panel.</p>
+    {% endif %}
+  </div>
+
+{% endif %}
+
+{% endblock %}

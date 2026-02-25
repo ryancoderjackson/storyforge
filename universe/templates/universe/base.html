@@ -88,8 +88,15 @@
 
 <nav class="navbar sf-nav">
   <div class="container py-2">
-    <span class="sf-brand">StoryForge</span>
-    <span class="sf-muted small">Cosmic Archive Interface</span>
+    <div class="d-flex justify-content-between align-items-center w-100">
+      <div class="sf-brand">StoryForge</div>
+
+      <div class="d-flex gap-3 align-items-center">
+        <a class="sf-muted small text-decoration-none" href="{% url 'universe:timeline_home' %}">Timeline</a>
+        <a class="sf-muted small text-decoration-none" href="{% url 'universe:factions_index' %}">Factions</a>
+        <span class="sf-muted small">Cosmic Archive Interface</span>
+      </div>
+    </div>
   </div>
 </nav>
 

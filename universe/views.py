@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 from .models import Universe, Event, Faction
 
 # Create your views here.
@@ -72,3 +72,21 @@ def event_detail(request, pk):
 
     context = {"event": event}
     return render(request, "universe/event_detail.html", context)
+
+@login_required
+def factions_index(request):
+    universe = Universe.objects.filter(owner=request.user).first()
+
+    factions = Faction.objects.none()
+    if universe:
+        factions = (
+            Faction.objects.filter(universe=universe)
+            .annotate(event_count=Count("events", distinct=True))
+            .order_by("name")
+        )
+
+    context = {
+        "universe": universe,
+        "factions": factions,
+    }
+    return render(request, "universe/factions_index.html", context)
