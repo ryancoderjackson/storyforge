@@ -24,19 +24,25 @@ StoryForge includes a seed_demo management command that populates a demo univers
 
 ## Screenshots
 
-### Event Timeline
+### Events
 ![Events](screenshots/event-timeline.png)
 
+### Event Detail
 ![Event Detail](screenshots/event-detail.png)
 
+### Search
 ![Search Results](screenshots/search-results.png)
 
+### Factions
 ![Factions](screenshots/factions-index.png)
 
+### Faction Detail
 ![Faction Detail](screenshots/faction-detail.png)
 
+### Locations
 ![Locations](screenshots/locations-index.png)
 
+### Location Detail
 ![Location Detail](screenshots/location-detail.png)
 
 ---
