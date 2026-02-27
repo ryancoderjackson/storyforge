@@ -4,9 +4,12 @@ from django.db.models import Prefetch, Count, Q
 from .models import Universe, Event, Faction, Location
 
 # Create your views here.
-@login_required
+
 def timeline_home(request):
-    universe = Universe.objects.filter(owner=request.user).first()
+    if request.user.is_authenticated:
+        universe = Universe.objects.filter(owner=request.user).first()
+    else:
+        universe = Universe.objects.none() # seeded demo universe
 
     events = Event.objects.none()
     total_events = 0
@@ -62,7 +65,7 @@ def timeline_home(request):
 
     return render(request, "universe/timeline_home.html", context)
 
-@login_required
+
 def event_detail(request, pk):
     event = get_object_or_404(
         Event.objects.select_related("universe", "location").prefetch_related("factions"),
@@ -73,9 +76,12 @@ def event_detail(request, pk):
     context = {"event": event}
     return render(request, "universe/event_detail.html", context)
 
-@login_required
+
 def factions_index(request):
-    universe = Universe.objects.filter(owner=request.user).first()
+    if request.user.is_authenticated:
+        universe = Universe.objects.filter(owner=request.user).first()
+    else:
+        universe = Universe.objects.none() # seeded demo universe
 
     factions = Faction.objects.none()
     if universe:
@@ -91,7 +97,7 @@ def factions_index(request):
     }
     return render(request, "universe/factions_index.html", context)
 
-@login_required
+
 def faction_detail(request, pk):
     faction = get_object_or_404(
         Faction.objects.select_related("universe"),
@@ -113,9 +119,12 @@ def faction_detail(request, pk):
     }
     return render(request, "universe/faction_detail.html", context)
 
-@login_required
+
 def locations_index(request):
-    universe = Universe.objects.filter(owner=request.user).first()
+    if request.user.is_authenticated:
+        universe = Universe.objects.filter(owner=request.user).first()
+    else:
+        universe = Universe.objects.none() # seeded demo universe
 
     locations = Location.objects.none()
     if universe:
@@ -155,9 +164,12 @@ def location_detail(request, pk):
     }
     return render(request, "universe/location_detail.html", context)
 
-@login_required
+
 def search(request):
-    universe = Universe.objects.filter(owner=request.user).first()
+    if request.user.is_authenticated:
+        universe = Universe.objects.filter(owner=request.user).first()
+    else:
+        universe = Universe.objects.none() # seeded demo universe
 
     q = (request.GET.get("q") or "").strip()
 
