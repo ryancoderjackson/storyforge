@@ -9,7 +9,7 @@ def timeline_home(request):
     if request.user.is_authenticated:
         universe = Universe.objects.filter(owner=request.user).first()
     else:
-        universe = Universe.objects.none() # seeded demo universe
+        universe = Universe.objects.first() # seeded demo universe
 
     events = Event.objects.none()
     total_events = 0
@@ -81,7 +81,7 @@ def factions_index(request):
     if request.user.is_authenticated:
         universe = Universe.objects.filter(owner=request.user).first()
     else:
-        universe = Universe.objects.none() # seeded demo universe
+        universe = Universe.objects.first() # seeded demo universe
 
     factions = Faction.objects.none()
     if universe:
@@ -124,7 +124,7 @@ def locations_index(request):
     if request.user.is_authenticated:
         universe = Universe.objects.filter(owner=request.user).first()
     else:
-        universe = Universe.objects.none() # seeded demo universe
+        universe = Universe.objects.first() # seeded demo universe
 
     locations = Location.objects.none()
     if universe:
@@ -142,7 +142,7 @@ def locations_index(request):
     return render(request, "universe/locations_index.html", context)
 
 
-@login_required
+
 def location_detail(request, pk):
     location = get_object_or_404(
         Location.objects.select_related("universe", "controlling_faction"),
@@ -169,7 +169,7 @@ def search(request):
     if request.user.is_authenticated:
         universe = Universe.objects.filter(owner=request.user).first()
     else:
-        universe = Universe.objects.none() # seeded demo universe
+        universe = Universe.objects.first() # seeded demo universe
 
     q = (request.GET.get("q") or "").strip()
 
