@@ -28,14 +28,17 @@ class Command(BaseCommand):
             owner = User.objects.filter(is_superuser=True).first() or User.objects.first()
 
         if not owner:
-            self.stdout.write(
-                self.style.ERROR(
-                    "No users exist yet. Create a superuser first:\n"
-                    "  python manage.py createsuperuser\n"
-                    "Then run:\n"
-                    "  python manage.py seed_demo"
-                )
+            owner, created = User.objects.get_or_create(
+                username="demo",
+                defaults={
+                    "email": "demo@example.com",
+                    "is_staff": True,
+                    "is_superuser": True,
+                },
             )
+            if created:
+                owner.set_password("demo12345")  # or something you choose
+                owner.save()
             return
 
         # --- Universe ---
@@ -43,6 +46,7 @@ class Command(BaseCommand):
             owner=owner,
             name="Cosmic Impact",
             defaults={
+                "is_demo": True,
                 "tagline": "A universe reshaped by The Rapture.",
                 "description": (
                     "Cosmic Impact is a dark sci-fi universe centered on a catastrophic event known as "
@@ -51,6 +55,11 @@ class Command(BaseCommand):
                 ),
             },
         )
+
+        # If it already existed, ensure flag is set
+        if not universe.is_demo:
+            universe.is_demo = True
+            universe.save(update_fields=["is_demo"])
 
         # --- Factions ---
         hca, _ = Faction.objects.get_or_create(

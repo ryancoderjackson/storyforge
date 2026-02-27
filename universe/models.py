@@ -16,6 +16,7 @@ class Universe(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="universes",
     )
+    is_demo = models.BooleanField(default=False)
     name = models.CharField(max_length=120)
     tagline = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
