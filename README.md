@@ -1,8 +1,13 @@
 # StoryForge
 
-StoryForge is a dark sci-fi universe management system built with Django. It’s designed to model a fictional universe as structured data — including factions, locations, and timeline events — then present that world through a clean “cosmic archive” interface with filtering and full-text search capabilities.
+StoryForge is a Django-based sci-fi universe management system designed to model fictional worlds as structured relational data. 
+
+It organizes universes into factions, locations, and chronological events, then presents them through a searchable and filterable “cosmic archive” interface.
 
 This capstone project uses **Django Admin as the authoring tool** and a custom front-end for browsing, filtering, and exploring the universe.
+
+🔗 Live Demo: https://storyforge-9m85.onrender.com
+The deployed demo includes a pre-seeded universe ("Cosmic Impact") for immediate exploration.
 
 ---
 
@@ -14,6 +19,7 @@ This capstone project uses **Django Admin as the authoring tool** and a custom f
 - Factions index + faction detail pages with related timeline events
 - Locations index + location detail pages with related timeline events
 - `seed_demo` command for one-step demo data setup (Cosmic Impact universe)
+- Production deployment with migrations + static handling
 
 ---
 
@@ -47,41 +53,48 @@ StoryForge includes a seed_demo management command that populates a demo univers
 
 ---
 
+## Why This Project
+
+StoryForge was built as a capstone backend project to demonstrate:
+- Relational data modeling
+- Query optimization
+- Production deployment workflow
+- Scalable content architecture for creative systems
+
+---
+
 ## Tech Stack
 - Python
 - Django
 - SQLite (dev)
 - HTML/CSS (custom theme) + Bootstrap (light usage)
+- PostgreSQL (Render)
+- Gunicorn
+- WhiteNoise (static files)
 
 ---
 
-## Roadmap
+## Architecture Highlights
 
-- Full-text search across events, factions, and locations
-- Character and lore modules for expanded universe modeling
-- REST API layer for external integrations
-- Production deployment with PostgreSQL
+- Abstract base model for timestamp tracking
+- Use of Django model relationships (ForeignKey, ManyToMany)
+- Query optimization with select_related and prefetch_related
+- Custom management command (seed_demo) for demo data
+- Environment-based production configuration
+- Automated migrations during deployment
+- Clear separation between content authoring (Django Admin) and public presentation layer
 
 ---
 
 ## Quickstart (Local Setup)
 ```bash
-# 1) Create & activate a virtual environment
-python -m venv .venv
-# Windows PowerShell:
-.venv\Scripts\Activate.ps1
-
-# 2) Install dependencies
+git clone https://github.com/ryancoderjackson/storyforge.git
+cd storyforge
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
-
-# 3) Run migrations
 python manage.py migrate
-
-# 4) Create admin user
-python manage.py createsuperuser
-
-# 5) Seed demo data
 python manage.py seed_demo
-
-# 6) Run server
 python manage.py runserver
+# Create a superuser if you’d like to access the Django Admin panel:
+python manage.py createsuperuser
