@@ -4,12 +4,14 @@ from django.db.models import Prefetch, Count, Q
 from .models import Universe, Event, Faction, Location
 
 # Create your views here.
+def get_active_universe(request):
+    if request.user.is_authenticated:
+        return Universe.objects.filter(owner=request.user).first()
+    return Universe.objects.filter(is_demo=True).first()
+
 
 def timeline_home(request):
-    if request.user.is_authenticated:
-        universe = Universe.objects.filter(owner=request.user).first()
-    else:
-        universe = Universe.objects.first() # seeded demo universe
+    universe = get_active_universe(request)
 
     events = Event.objects.none()
     total_events = 0
@@ -67,10 +69,12 @@ def timeline_home(request):
 
 
 def event_detail(request, pk):
+    universe = get_active_universe(request)
+
     event = get_object_or_404(
         Event.objects.select_related("universe", "location").prefetch_related("factions"),
         pk=pk,
-        universe__owner=request.user,
+        universe=universe,
     )
 
     context = {"event": event}
@@ -78,10 +82,7 @@ def event_detail(request, pk):
 
 
 def factions_index(request):
-    if request.user.is_authenticated:
-        universe = Universe.objects.filter(owner=request.user).first()
-    else:
-        universe = Universe.objects.first() # seeded demo universe
+    universe = get_active_universe(request)
 
     factions = Faction.objects.none()
     if universe:
@@ -99,10 +100,12 @@ def factions_index(request):
 
 
 def faction_detail(request, pk):
+    universe = get_active_universe(request)
+
     faction = get_object_or_404(
         Faction.objects.select_related("universe"),
         pk=pk,
-        universe__owner=request.user,
+        universe=universe,
     )
 
     events = (
@@ -121,10 +124,7 @@ def faction_detail(request, pk):
 
 
 def locations_index(request):
-    if request.user.is_authenticated:
-        universe = Universe.objects.filter(owner=request.user).first()
-    else:
-        universe = Universe.objects.first() # seeded demo universe
+    universe = get_active_universe(request)
 
     locations = Location.objects.none()
     if universe:
@@ -144,10 +144,12 @@ def locations_index(request):
 
 
 def location_detail(request, pk):
+    universe = get_active_universe(request)
+
     location = get_object_or_404(
         Location.objects.select_related("universe", "controlling_faction"),
         pk=pk,
-        universe__owner=request.user,
+        universe=universe,
     )
 
     events = (
@@ -166,10 +168,7 @@ def location_detail(request, pk):
 
 
 def search(request):
-    if request.user.is_authenticated:
-        universe = Universe.objects.filter(owner=request.user).first()
-    else:
-        universe = Universe.objects.first() # seeded demo universe
+    universe = get_active_universe(request)
 
     q = (request.GET.get("q") or "").strip()
 
